@@ -1,0 +1,10 @@
+# Env files — never commit secrets
+.env
+.env.local
+.env*.local
+
+# OS
+.DS_Store
+
+# Dependencies (yournextstore has its own, but root-level if any)
+node_modules/
