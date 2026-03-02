@@ -29,16 +29,16 @@ export function CartItem({ item }: CartItemProps) {
 	const handleRemove = () => {
 		startTransition(async () => {
 			dispatch({ type: "REMOVE", variantId: productVariant.id });
-			await removeFromCart(productVariant.id);
-			router.refresh();
+			const result = await removeFromCart(productVariant.id);
+			if (result?.success) router.refresh();
 		});
 	};
 
 	const handleIncrement = () => {
 		startTransition(async () => {
 			dispatch({ type: "INCREASE", variantId: productVariant.id });
-			await setCartQuantity(productVariant.id, quantity + 1);
-			router.refresh();
+			const result = await setCartQuantity(productVariant.id, quantity + 1);
+			if (result?.success) router.refresh();
 		});
 	};
 
@@ -49,8 +49,8 @@ export function CartItem({ item }: CartItemProps) {
 		}
 		startTransition(async () => {
 			dispatch({ type: "DECREASE", variantId: productVariant.id });
-			await setCartQuantity(productVariant.id, quantity - 1);
-			router.refresh();
+			const result = await setCartQuantity(productVariant.id, quantity - 1);
+			if (result?.success) router.refresh();
 		});
 	};
 

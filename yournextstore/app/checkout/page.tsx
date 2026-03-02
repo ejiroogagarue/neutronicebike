@@ -1,12 +1,32 @@
 "use client";
 
 import Link from "next/link";
+import { useState, useTransition } from "react";
+import { createCheckoutSession } from "@/app/checkout/actions";
 import { useCart } from "@/app/cart/cart-context";
 import { CURRENCY, LOCALE } from "@/lib/constants";
 import { formatMoney } from "@/lib/money";
 
 export default function CheckoutPage() {
 	const { items, subtotal } = useCart();
+	const [isPending, startTransition] = useTransition();
+	const [error, setError] = useState<string | null>(null);
+
+	const handleCheckout = () => {
+		setError(null);
+		startTransition(async () => {
+			try {
+				const lines = items.map((item) => ({
+					variantId: item.productVariant.id,
+					quantity: item.quantity,
+				}));
+				const { url } = await createCheckoutSession(lines);
+				if (url) window.location.href = url;
+			} catch (err) {
+				setError(err instanceof Error ? err.message : "Checkout failed. Please try again.");
+			}
+		});
+	};
 
 	const hasItems = items.length > 0;
 	const subtotalFormatted = formatMoney({
@@ -94,16 +114,21 @@ export default function CheckoutPage() {
 									<p>• Secure Stripe-hosted checkout.</p>
 									<p>• 3D Secure support where required by your bank.</p>
 								</div>
+								{error && (
+									<p className="mt-2 text-sm text-destructive font-medium" role="alert">
+										{error}
+									</p>
+								)}
 								<button
 									type="button"
-									className="mt-5 inline-flex w-full items-center justify-center min-h-[48px] sm:min-h-[52px] px-6 rounded-full bg-[#0f0f0f] text-primary text-sm sm:text-base font-semibold hover:bg-[#1a1a1a] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-[#fdfdfd]"
-									disabled
+									onClick={handleCheckout}
+									disabled={isPending}
+									className="mt-5 inline-flex w-full items-center justify-center min-h-[48px] sm:min-h-[52px] px-6 rounded-full bg-[#0f0f0f] text-primary text-sm sm:text-base font-semibold hover:bg-[#1a1a1a] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-[#fdfdfd] disabled:opacity-70 disabled:cursor-not-allowed"
 								>
-									Checkout with card (coming soon)
+									{isPending ? "Redirecting to Stripe…" : "Checkout with card"}
 								</button>
 								<p className="mt-2 text-[0.7rem] sm:text-xs text-muted-foreground">
-									Stripe integration is not yet configured on this environment. Once enabled, this
-									button will take you to secure card entry.
+									Secure Stripe-hosted checkout. You’ll complete payment on Stripe’s page.
 								</p>
 							</div>
 							<div className="text-xs sm:text-sm text-muted-foreground">

@@ -11,7 +11,13 @@ type CheckoutLineInput = {
 function resolveStripePriceId(variantId: string): string {
 	for (const product of staticProducts) {
 		const match = product.variants.find((v) => v.id === variantId);
-		if (match?.stripePriceId) return match.stripePriceId;
+		const priceId = match?.stripePriceId;
+		if (priceId && !priceId.startsWith("price_TODO")) return priceId;
+		if (priceId?.startsWith("price_TODO")) {
+			throw new Error(
+				`Stripe price IDs are not configured yet. Add real price IDs for each variant in lib/static/products.ts. See Stripe Dashboard → Products.`,
+			);
+		}
 	}
 
 	throw new Error(`No Stripe price configured for variant ${variantId}.`);

@@ -3,13 +3,14 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import {
 	Accordion,
 	AccordionContent,
 	AccordionItem,
 	AccordionTrigger,
 } from "@/components/ui/accordion";
+import { useCart } from "@/app/cart/cart-context";
 import { ColorPicker } from "@/components/product/color-picker";
 import { HoverGallery } from "@/components/product/hover-gallery";
 import { QuantityPicker } from "@/components/product/quantity-picker";
@@ -41,13 +42,42 @@ export function ProductDetailContent({
 	logoImage,
 }: ProductDetailContentProps) {
 	const searchParams = useSearchParams();
+	const { openCart, dispatch } = useCart();
 	const [selectedColor, setSelectedColor] = useState(() =>
 		getInitialColorIndex(searchParams),
 	);
 	const [quantity, setQuantity] = useState(1);
+	const [isAdding, setIsAdding] = useState(false);
 
 	const [front, back] = colorImages[selectedColor] ?? colorImages[0] ?? ["", ""];
 	const colorName = COLOR_NAMES[selectedColor] ?? "Yellow";
+
+	const selectedVariant = product.variants[selectedColor] ?? product.variants[0];
+
+	const handleAddToCart = useCallback(() => {
+		if (!selectedVariant) return;
+		setIsAdding(true);
+		openCart();
+		dispatch({
+			type: "ADD_ITEM",
+			item: {
+				quantity,
+				productVariant: {
+					id: selectedVariant.id,
+					price: String(selectedVariant.price),
+					images: selectedVariant.image ? [selectedVariant.image] : product.images,
+					product: {
+						id: product.id,
+						name: product.name,
+						slug: product.slug,
+						images: product.images,
+					},
+				},
+			},
+		});
+		setQuantity(1);
+		setIsAdding(false);
+	}, [selectedVariant, quantity, product, openCart, dispatch]);
 
 	return (
 		<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-5 lg:py-6">
@@ -120,9 +150,11 @@ export function ProductDetailContent({
 					{/* CTA — inverted: dark bg, yellow text */}
 					<button
 						type="button"
-						className="inline-flex items-center justify-center min-h-[48px] sm:min-h-[52px] px-8 bg-[#0f0f0f] text-primary rounded-none text-base font-semibold hover:bg-[#1a1a1a] transition-colors w-full focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-primary"
+						onClick={handleAddToCart}
+						disabled={!selectedVariant || isAdding}
+						className="inline-flex items-center justify-center min-h-[48px] sm:min-h-[52px] px-8 bg-[#0f0f0f] text-primary rounded-none text-base font-semibold hover:bg-[#1a1a1a] transition-colors w-full focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-primary disabled:opacity-70 disabled:cursor-not-allowed"
 					>
-						Add To Cart
+						{isAdding ? "Adding…" : "Add To Cart"}
 					</button>
 
 					{/* Trust badges */}
