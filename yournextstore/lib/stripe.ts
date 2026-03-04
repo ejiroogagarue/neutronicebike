@@ -33,9 +33,8 @@ export function getStripe(): Stripe {
 	const StripeCtor: typeof Stripe = require("stripe");
 
 	stripeClient = new StripeCtor(secretKey, {
-		apiVersion: "2024-06-20",
+		apiVersion: "2025-02-24.acacia",
 	});
 
 	return stripeClient;
 }
-

@@ -70,18 +70,18 @@ const colors = [
 function buildVariants(
 	productSlug: string,
 	basePrice: number,
-	imagePrefix: string,
+	_imagePrefix: string,
+	stripePriceIds?: string[],
 ): ProductVariant[] {
-	return colors.map((c) => ({
+	return colors.map((c, i) => ({
 		id: `${productSlug}-${c.slug}`,
 		name: c.name,
 		slug: c.slug,
 		price: basePrice,
 		currency: "USD",
-		image: `/images/${imagePrefix}-${c.slug}.png`,
+		// Keep image optional here; product pages use catalog color images.
 		attributes: { Color: c.name },
-		// Placeholder; replace with real Stripe price IDs once Stripe products are created.
-		stripePriceId: `price_TODO_${productSlug}_${c.slug}`,
+		stripePriceId: stripePriceIds?.[i],
 	}));
 }
 
@@ -93,12 +93,18 @@ export const staticProducts: StaticProduct[] = [
 		tagline: "Endless range. Smooth ride. Built for the long haul.",
 		description:
 			"Single motor, dual battery, maximum range — designed for couriers and long-distance riders who measure their day in kilometres, not minutes. Quiet, efficient, relentless.",
-		shortDescription:
-			"For urban explorers who need comfort, distance, and quiet strength day after day.",
+		shortDescription: "For urban explorers who need comfort, distance, and quiet strength day after day.",
 		price: 459900,
 		currency: "USD",
 		images: ["/images/FrontView.jpg", "/images/SideView.jpg", "/images/BackView.jpg"],
-		variants: buildVariants("journey", 459900, "Journey"),
+		variants: buildVariants("journey", 459900, "Journey", [
+			"price_1T6chaFUF1mqoB36aO1THbLv",
+			"price_1T6v02FUF1mqoB36uaWnTXtE",
+			"price_1T6v0pFUF1mqoB36GWSTYjSa",
+			"price_1T6v2oFUF1mqoB36HaqrGQyF",
+			"price_1T6v6RFUF1mqoB365bwhN2Eh",
+			"price_1T6v8cFUF1mqoB36XJgfb9iQ",
+		]),
 		motor: "2000W Rear Hub",
 		battery: "Dual 35Ah",
 		quickStats: [
@@ -146,15 +152,11 @@ export const staticProducts: StaticProduct[] = [
 			},
 			{
 				category: "Gearing",
-				rows: [
-					{ label: "Gears", value: "8-speed with 9-speed capability PAS" },
-				],
+				rows: [{ label: "Gears", value: "8-speed with 9-speed capability PAS" }],
 			},
 			{
 				category: "Display",
-				rows: [
-					{ label: "Display", value: "TFT UKC1 LCD with Bluetooth" },
-				],
+				rows: [{ label: "Display", value: "TFT UKC1 LCD with Bluetooth" }],
 			},
 			{
 				category: "Speed",
@@ -199,7 +201,7 @@ export const staticProducts: StaticProduct[] = [
 				category: "Wheels",
 				rows: [
 					{ label: "Tire", value: "Kenda Nevegal X" },
-					{ label: "Size", value: "26\" × 4.0\"" },
+					{ label: "Size", value: '26" × 4.0"' },
 					{ label: "Rim", value: "Double Wall" },
 				],
 			},
@@ -239,12 +241,18 @@ export const staticProducts: StaticProduct[] = [
 		tagline: "All-terrain beast. Dual motors. Total control at speed.",
 		description:
 			"Dual 1000W hub motors, dual 35Ah Samsung batteries, and dual suspension — built to eat hills, haul weight, and outlast everything. Configure single or dual to match how you ride.",
-		shortDescription:
-			"All terrain beast, built for raw climbs, brutal streets and total control at speed.",
+		shortDescription: "All terrain beast, built for raw climbs, brutal streets and total control at speed.",
 		price: 305300,
 		currency: "USD",
 		images: ["/images/Yellow.jpg", "/images/Red.jpg", "/images/Green_1.png"],
-		variants: buildVariants("hunter", 305300, "Hunter"),
+		variants: buildVariants("hunter", 305300, "Hunter", [
+			"price_1T6v9dFUF1mqoB36XuDBoR52",
+			"price_1T6vALFUF1mqoB36cRgp302a",
+			"price_1T6vCTFUF1mqoB36GReVPVOC",
+			"price_1T6vD6FUF1mqoB36SaE8TzFZ",
+			"price_1T6vDhFUF1mqoB36JHqrCYLf",
+			"price_1T6vEBFUF1mqoB36J1gsznCz",
+		]),
 		motor: "Dual 1000W Hub",
 		battery: "Dual 35Ah",
 		quickStats: [
@@ -333,7 +341,7 @@ export const staticProducts: StaticProduct[] = [
 				category: "Wheels",
 				rows: [
 					{ label: "Tire", value: "Kenda K1151 Snowmobile" },
-					{ label: "Size", value: "24\" × 4.0\"" },
+					{ label: "Size", value: '24" × 4.0"' },
 					{ label: "Rim", value: "Double Wall" },
 				],
 			},

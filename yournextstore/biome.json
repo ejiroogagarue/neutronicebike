@@ -10,6 +10,8 @@
 		"ignoreUnknown": false,
 		"includes": [
 			"**",
+			"!**/.vscode",
+			"!**/convex/_generated",
 			"!**/package.json",
 			"!**/bun.lockb",
 			"!**/vercel.json",
@@ -128,6 +130,16 @@
 		}
 	},
 	"overrides": [
+		{
+			"includes": ["**/convex/schema.ts"],
+			"linter": {
+				"rules": {
+					"style": {
+						"noDefaultExport": "off"
+					}
+				}
+			}
+		},
 		{
 			"includes": [
 				"**/*.d.ts",

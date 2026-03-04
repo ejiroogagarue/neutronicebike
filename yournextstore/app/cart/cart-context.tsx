@@ -1,7 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { createContext, useCallback, useContext, useMemo, useOptimistic, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 
 export type CartLineItem = {
 	quantity: number;
@@ -49,80 +49,91 @@ type CartProviderProps = {
 	initialCartId: string | null;
 };
 
-export function CartProvider({ children, initialCart, initialCartId }: CartProviderProps) {
-	const [isOpen, setIsOpen] = useState(false);
-
-	const [optimisticCart, dispatchCartAction] = useOptimistic(initialCart, (state, action: CartAction) => {
-		if (!state) {
-			// Handle ADD_ITEM when cart is null
-			if (action.type === "ADD_ITEM") {
-				return {
-					id: "optimistic",
-					lineItems: [action.item],
-				};
-			}
-			return state;
+function cartReducer(state: Cart | null, action: CartAction): Cart | null {
+	if (!state) {
+		if (action.type === "ADD_ITEM") {
+			return { id: "optimistic", lineItems: [action.item] };
 		}
-
-		switch (action.type) {
-			case "INCREASE":
+		return state;
+	}
+	switch (action.type) {
+		case "INCREASE":
+			return {
+				...state,
+				lineItems: state.lineItems.map((item) =>
+					item.productVariant.id === action.variantId ? { ...item, quantity: item.quantity + 1 } : item,
+				),
+			};
+		case "DECREASE": {
+			const next = state.lineItems
+				.map((item) => {
+					if (item.productVariant.id !== action.variantId) return item;
+					if (item.quantity - 1 <= 0) return null;
+					return { ...item, quantity: item.quantity - 1 };
+				})
+				.filter((item): item is CartLineItem => item !== null);
+			return next.length === 0 ? null : { ...state, lineItems: next };
+		}
+		case "REMOVE": {
+			const next = state.lineItems.filter((item) => item.productVariant.id !== action.variantId);
+			return next.length === 0 ? null : { ...state, lineItems: next };
+		}
+		case "ADD_ITEM": {
+			const existing = state.lineItems.find((i) => i.productVariant.id === action.item.productVariant.id);
+			if (existing) {
 				return {
 					...state,
 					lineItems: state.lineItems.map((item) =>
-						item.productVariant.id === action.variantId ? { ...item, quantity: item.quantity + 1 } : item,
+						item.productVariant.id === action.item.productVariant.id
+							? { ...item, quantity: item.quantity + action.item.quantity }
+							: item,
 					),
 				};
-
-			case "DECREASE":
-				return {
-					...state,
-					lineItems: state.lineItems
-						.map((item) => {
-							if (item.productVariant.id === action.variantId) {
-								if (item.quantity - 1 <= 0) {
-									return null;
-								}
-								return { ...item, quantity: item.quantity - 1 };
-							}
-							return item;
-						})
-						.filter((item): item is CartLineItem => item !== null),
-				};
-
-			case "REMOVE":
-				return {
-					...state,
-					lineItems: state.lineItems.filter((item) => item.productVariant.id !== action.variantId),
-				};
-
-			case "ADD_ITEM": {
-				const existingItem = state.lineItems.find(
-					(item) => item.productVariant.id === action.item.productVariant.id,
-				);
-
-				if (existingItem) {
-					return {
-						...state,
-						lineItems: state.lineItems.map((item) =>
-							item.productVariant.id === action.item.productVariant.id
-								? { ...item, quantity: item.quantity + action.item.quantity }
-								: item,
-						),
-					};
-				}
-
-				return {
-					...state,
-					lineItems: [...state.lineItems, action.item],
-				};
 			}
-
-			default:
-				return state;
+			return { ...state, lineItems: [...state.lineItems, action.item] };
 		}
-	});
+		default:
+			return state;
+	}
+}
 
-	const items = useMemo(() => optimisticCart?.lineItems ?? [], [optimisticCart]);
+export function CartProvider({ children, initialCart, initialCartId }: CartProviderProps) {
+	const [isOpen, setIsOpen] = useState(false);
+	const [cart, setCart] = useState<Cart | null>(initialCart);
+	const storageKey = "neutronic_cart_v1";
+
+	useEffect(() => {
+		// If server provided an initial cart, prefer it.
+		if (initialCart) return;
+		try {
+			const raw = window.localStorage.getItem(storageKey);
+			if (!raw) return;
+			const parsed = JSON.parse(raw) as Cart | null;
+			if (parsed?.lineItems?.length) {
+				setCart(parsed);
+			}
+		} catch {
+			// Ignore corrupt local cart payloads.
+		}
+	}, [initialCart]);
+
+	useEffect(() => {
+		try {
+			if (!cart || cart.lineItems.length === 0) {
+				window.localStorage.removeItem(storageKey);
+				return;
+			}
+			window.localStorage.setItem(storageKey, JSON.stringify(cart));
+		} catch {
+			// Ignore storage quota/serialization errors.
+		}
+	}, [cart]);
+
+	const dispatchCartAction = useCallback((action: CartAction) => {
+		setCart((prev) => cartReducer(prev, action));
+	}, []);
+
+	const items = useMemo(() => cart?.lineItems ?? [], [cart]);
 
 	const itemCount = useMemo(() => items.reduce((sum, item) => sum + item.quantity, 0), [items]);
 
@@ -135,13 +146,12 @@ export function CartProvider({ children, initialCart, initialCartId }: CartProvi
 	const openCart = useCallback(() => setIsOpen(true), []);
 	const closeCart = useCallback(() => setIsOpen(false), []);
 
-	// Derive cartId from optimistic cart or initial
-	const currentCartId =
-		optimisticCart?.id && optimisticCart.id !== "optimistic" ? optimisticCart.id : initialCartId;
+	// Derive cartId from cart or initial
+	const currentCartId = cart?.id && cart.id !== "optimistic" ? cart.id : initialCartId;
 
 	const value = useMemo(
 		() => ({
-			cart: optimisticCart,
+			cart,
 			items,
 			itemCount,
 			subtotal,
@@ -151,17 +161,7 @@ export function CartProvider({ children, initialCart, initialCartId }: CartProvi
 			closeCart,
 			dispatch: dispatchCartAction,
 		}),
-		[
-			optimisticCart,
-			items,
-			itemCount,
-			subtotal,
-			isOpen,
-			currentCartId,
-			openCart,
-			closeCart,
-			dispatchCartAction,
-		],
+		[cart, items, itemCount, subtotal, isOpen, currentCartId, openCart, closeCart, dispatchCartAction],
 	);
 
 	return <CartContext.Provider value={value}>{children}</CartContext.Provider>;

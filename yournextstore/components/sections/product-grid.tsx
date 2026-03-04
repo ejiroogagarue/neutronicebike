@@ -24,7 +24,7 @@ export async function ProductGrid({
 	products,
 	limit = 6,
 	showViewAll = true,
-	viewAllHref = "/products",
+	viewAllHref = "/catalog",
 }: ProductGridProps) {
 	"use cache";
 	cacheLife("minutes");
@@ -40,7 +40,6 @@ export async function ProductGrid({
 				</div>
 				{showViewAll && (
 					<YnsLink
-						prefetch={"eager"}
 						href={viewAllHref}
 						className="hidden sm:inline-flex items-center gap-1 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
 					>
@@ -85,7 +84,7 @@ export async function ProductGrid({
 					const secondaryImage = allImages[1];
 
 					return (
-						<YnsLink prefetch={"eager"} key={product.id} href={`/product/${product.slug}`} className="group">
+						<YnsLink key={product.id} href={`/product/${product.slug}`} className="group">
 							<div className="relative aspect-square bg-secondary rounded-2xl overflow-hidden mb-4">
 								{primaryImage && (
 									<YNSImage
@@ -118,7 +117,6 @@ export async function ProductGrid({
 			{showViewAll && (
 				<div className="mt-12 text-center sm:hidden">
 					<YnsLink
-						prefetch={"eager"}
 						href={viewAllHref}
 						className="inline-flex items-center gap-1 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
 					>

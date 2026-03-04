@@ -6,18 +6,18 @@ import { getStaticProducts } from "@/lib/static/products";
 export const metadata = {
 	title: "Bikes — Neutronic",
 	description: "Excalibur Journey & Hunter. Courier-tough eBikes.",
+	alternates: {
+		canonical: "/catalog",
+	},
 };
 
-const CATALOG_DATA: Record<
-	string,
-	{ colorImages: [string, string][]; logo: string }
-> = {
+const CATALOG_DATA: Record<string, { colorImages: [string, string][]; logo: string }> = {
 	"excalibur-journey": {
-		colorImages: ASSETS.catalogColorImages["excalibur-journey"]!,
+		colorImages: ASSETS.catalogColorImages["excalibur-journey"] ?? [],
 		logo: ASSETS.journey.logo,
 	},
 	"excalibur-hunter": {
-		colorImages: ASSETS.catalogColorImages["excalibur-hunter"]!,
+		colorImages: ASSETS.catalogColorImages["excalibur-hunter"] ?? [],
 		logo: ASSETS.hunter.logo,
 	},
 };
@@ -27,6 +27,7 @@ export default function CatalogPage() {
 	return (
 		<main className="min-h-screen bg-[#fdfdfd] text-foreground overflow-x-hidden">
 			<div className="max-w-7xl mx-auto">
+				<h1 className="sr-only">Neutronic Bikes Catalog</h1>
 				{products.map((product, index) => {
 					const data = CATALOG_DATA[product.slug];
 					if (!data) return null;
@@ -35,7 +36,9 @@ export default function CatalogPage() {
 						<section
 							key={product.id}
 							aria-labelledby={`catalog-${product.slug}-heading`}
-							className={isFirst ? undefined : "mt-6 sm:mt-8 lg:mt-10 border-t border-border pt-5 sm:pt-6 lg:pt-8"}
+							className={
+								isFirst ? undefined : "mt-6 sm:mt-8 lg:mt-10 border-t border-border pt-5 sm:pt-6 lg:pt-8"
+							}
 						>
 							<CatalogProductRow
 								productSlug={product.slug}

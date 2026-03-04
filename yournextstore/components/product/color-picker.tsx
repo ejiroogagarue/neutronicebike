@@ -16,11 +16,7 @@ export function ColorPicker({
 	sizeClassName = "w-8 h-8 sm:w-9 sm:h-9 lg:w-11 lg:h-11",
 }: ColorPickerProps) {
 	return (
-		<div
-			className="flex flex-wrap gap-2 sm:gap-2.5 lg:gap-3"
-			role="group"
-			aria-label="Available colors"
-		>
+		<div className="flex flex-wrap gap-2 sm:gap-2.5 lg:gap-3" role="group" aria-label="Available colors">
 			{ASSETS.swatches.map((src, i) => {
 				const name = COLOR_NAMES[i] ?? "Yellow";
 				const isSelected = i === selectedColor;

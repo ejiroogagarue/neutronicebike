@@ -1,10 +1,18 @@
 import { CheckCircle } from "lucide-react";
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { getStripe } from "@/lib/stripe";
 import { CURRENCY, LOCALE } from "@/lib/constants";
 import { formatMoney } from "@/lib/money";
+import { getStripe } from "@/lib/stripe";
+
+export const metadata: Metadata = {
+	robots: {
+		index: false,
+		follow: false,
+	},
+};
 
 export default async function OrderSuccessPage(props: { params: Promise<{ id: string }> }) {
 	const { id } = await props.params;
@@ -42,9 +50,7 @@ export default async function OrderSuccessPage(props: { params: Promise<{ id: st
 					<h1 className="text-2xl sm:text-3xl font-semibold italic tracking-tight">
 						Thank you for your order!
 					</h1>
-					<p className="text-muted-foreground mt-2">
-						Your payment has been confirmed.
-					</p>
+					<p className="text-muted-foreground mt-2">Your payment has been confirmed.</p>
 					{customerEmail && (
 						<p className="text-sm text-muted-foreground mt-1">
 							A confirmation email will be sent to {customerEmail}
@@ -63,16 +69,14 @@ export default async function OrderSuccessPage(props: { params: Promise<{ id: st
 							const productName =
 								product && typeof product === "object" && "name" in product
 									? (product.name as string)
-									: item.description ?? "Item";
+									: (item.description ?? "Item");
 							const qty = item.quantity ?? 1;
 							const amount = item.amount_total ?? 0;
 
 							return (
 								<div key={item.id ?? idx} className="flex gap-4 p-6">
 									<div className="flex min-w-0 flex-1 flex-col justify-between">
-										<p className="text-sm font-medium leading-tight text-foreground">
-											{productName}
-										</p>
+										<p className="text-sm font-medium leading-tight text-foreground">{productName}</p>
 										<p className="text-sm text-muted-foreground mt-1">Qty: {qty}</p>
 										<p className="text-sm font-semibold mt-2">
 											{formatMoney({

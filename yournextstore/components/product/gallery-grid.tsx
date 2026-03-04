@@ -13,13 +13,7 @@ type GalleryGridProps = {
 
 const VIEW_LABELS = ["Front", "Side", "Back", "360°"];
 
-export function GalleryGrid({
-	images,
-	videoSrc,
-	shootImage,
-	alt,
-	priority = false,
-}: GalleryGridProps) {
+export function GalleryGrid({ images, videoSrc, shootImage, alt, priority = false }: GalleryGridProps) {
 	const allImages = [...images];
 	const hasVideo = Boolean(videoSrc);
 	const videoIndex = hasVideo ? allImages.length : -1;
@@ -111,7 +105,7 @@ export function GalleryGrid({
 								src={videoSrc}
 								muted
 								playsInline
-								preload="metadata"
+								preload="none"
 								className="absolute inset-0 w-full h-full object-contain"
 							/>
 							{/* Play icon overlay */}

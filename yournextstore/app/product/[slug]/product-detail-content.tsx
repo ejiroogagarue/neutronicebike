@@ -3,17 +3,13 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { useCallback, useState } from "react";
-import {
-	Accordion,
-	AccordionContent,
-	AccordionItem,
-	AccordionTrigger,
-} from "@/components/ui/accordion";
+import { useCallback, useState, useTransition } from "react";
+import { addToCart } from "@/app/cart/actions";
 import { useCart } from "@/app/cart/cart-context";
 import { ColorPicker } from "@/components/product/color-picker";
 import { HoverGallery } from "@/components/product/hover-gallery";
 import { QuantityPicker } from "@/components/product/quantity-picker";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { ASSETS, COLOR_NAMES } from "@/lib/static/asset-paths";
 import type { StaticProduct } from "@/lib/static/products";
 import { formatPrice } from "@/lib/static/products";
@@ -29,9 +25,7 @@ type ProductDetailContentProps = {
 function getInitialColorIndex(searchParams: URLSearchParams): number {
 	const colorParam = searchParams.get("color");
 	if (!colorParam) return 0;
-	const idx = COLOR_NAMES.findIndex(
-		(c) => c.toLowerCase() === colorParam.toLowerCase(),
-	);
+	const idx = COLOR_NAMES.findIndex((c) => c.toLowerCase() === colorParam.toLowerCase());
 	return idx >= 0 ? idx : 0;
 }
 
@@ -43,41 +37,48 @@ export function ProductDetailContent({
 }: ProductDetailContentProps) {
 	const searchParams = useSearchParams();
 	const { openCart, dispatch } = useCart();
-	const [selectedColor, setSelectedColor] = useState(() =>
-		getInitialColorIndex(searchParams),
-	);
+	const [selectedColor, setSelectedColor] = useState(() => getInitialColorIndex(searchParams));
 	const [quantity, setQuantity] = useState(1);
-	const [isAdding, setIsAdding] = useState(false);
+	const [isAdding, startTransition] = useTransition();
 
 	const [front, back] = colorImages[selectedColor] ?? colorImages[0] ?? ["", ""];
 	const colorName = COLOR_NAMES[selectedColor] ?? "Yellow";
 
 	const selectedVariant = product.variants[selectedColor] ?? product.variants[0];
 
+	/** Use catalog [front, back] images so cart thumbnails resolve (variant.image paths may not exist). */
+	const cartImages = (colorImages[selectedColor] ?? colorImages[0])?.filter(Boolean) ?? product.images;
+
 	const handleAddToCart = useCallback(() => {
 		if (!selectedVariant) return;
-		setIsAdding(true);
 		openCart();
-		dispatch({
-			type: "ADD_ITEM",
-			item: {
-				quantity,
-				productVariant: {
-					id: selectedVariant.id,
-					price: String(selectedVariant.price),
-					images: selectedVariant.image ? [selectedVariant.image] : product.images,
-					product: {
-						id: product.id,
-						name: product.name,
-						slug: product.slug,
-						images: product.images,
+		startTransition(async () => {
+			dispatch({
+				type: "ADD_ITEM",
+				item: {
+					quantity,
+					productVariant: {
+						id: selectedVariant.id,
+						price: String(selectedVariant.price),
+						images: cartImages.length > 0 ? cartImages : product.images,
+						product: {
+							id: product.id,
+							name: product.name,
+							slug: product.slug,
+							images: product.images,
+						},
 					},
 				},
-			},
+			});
+			// Keep backend cart in sync when available; local cart remains the fallback.
+			try {
+				await addToCart(selectedVariant.id, quantity);
+			} catch {
+				// Ignore backend failures in local/static mode.
+			}
+			setQuantity(1);
 		});
-		setQuantity(1);
-		setIsAdding(false);
-	}, [selectedVariant, quantity, product, openCart, dispatch]);
+	}, [selectedVariant, quantity, product, openCart, dispatch, cartImages]);
 
 	return (
 		<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-5 lg:py-6">
@@ -108,11 +109,10 @@ export function ProductDetailContent({
 							priority
 						/>
 					</div>
+					<h1 className="sr-only">{product.name}</h1>
 
 					{/* Price */}
-					<p className="text-2xl sm:text-3xl font-semibold">
-						{formatPrice(product.price, product.currency)}
-					</p>
+					<p className="text-2xl sm:text-3xl font-semibold">{formatPrice(product.price, product.currency)}</p>
 
 					{/* Tagline */}
 					<p className="text-[0.95rem] sm:text-base font-medium leading-relaxed opacity-90">
@@ -131,9 +131,7 @@ export function ProductDetailContent({
 
 					{/* Color picker */}
 					<div>
-						<h3 className="text-sm font-semibold mb-2">
-							Color — {colorName}
-						</h3>
+						<h3 className="text-sm font-semibold mb-2">Color — {colorName}</h3>
 						<ColorPicker
 							selectedColor={selectedColor}
 							onSelectColor={setSelectedColor}
@@ -172,13 +170,10 @@ export function ProductDetailContent({
 				<Accordion type="single" collapsible className="w-full">
 					<AccordionItem value="features">
 						<AccordionTrigger className="text-base font-semibold">Key Features</AccordionTrigger>
-					<AccordionContent>
+						<AccordionContent>
 							<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-5">
 								{product.features.map((feature) => (
-									<div
-										key={feature.title}
-										className="rounded-2xl overflow-hidden flex flex-col"
-									>
+									<div key={feature.title} className="rounded-2xl overflow-hidden flex flex-col">
 										{/* Image — gray top */}
 										<div className="relative aspect-square sm:aspect-4/3 bg-[#f3f3f3] border border-primary shrink-0">
 											<Image
@@ -206,33 +201,32 @@ export function ProductDetailContent({
 						</AccordionContent>
 					</AccordionItem>
 
-				<AccordionItem value="specs">
-					<AccordionTrigger className="text-base font-semibold">Tech Specs</AccordionTrigger>
-					<AccordionContent>
-						<div className="space-y-5">
-							{product.specs.map((cat) => (
-								<div key={cat.category}>
-									<h4 className="text-sm font-semibold text-foreground mb-2">
-										{cat.category}
-									</h4>
-									<dl className="grid grid-cols-[auto_1fr] gap-x-6 gap-y-1.5 text-sm">
-										{cat.rows.map((row) => (
-											<div key={row.label} className="contents">
-												<dt className="font-medium text-foreground/80">{row.label}</dt>
-												<dd className="text-muted-foreground">{row.value}</dd>
-											</div>
-										))}
-									</dl>
-								</div>
-							))}
-						</div>
-					</AccordionContent>
-				</AccordionItem>
+					<AccordionItem value="specs">
+						<AccordionTrigger className="text-base font-semibold">Tech Specs</AccordionTrigger>
+						<AccordionContent>
+							<div className="space-y-5">
+								{product.specs.map((cat) => (
+									<div key={cat.category}>
+										<h4 className="text-sm font-semibold text-foreground mb-2">{cat.category}</h4>
+										<dl className="grid grid-cols-[auto_1fr] gap-x-6 gap-y-1.5 text-sm">
+											{cat.rows.map((row) => (
+												<div key={row.label} className="contents">
+													<dt className="font-medium text-foreground/80">{row.label}</dt>
+													<dd className="text-muted-foreground">{row.value}</dd>
+												</div>
+											))}
+										</dl>
+									</div>
+								))}
+							</div>
+						</AccordionContent>
+					</AccordionItem>
 
 					<AccordionItem value="size">
 						<AccordionTrigger className="text-base font-semibold">Size Frame & Geometry</AccordionTrigger>
 						<AccordionContent className="text-muted-foreground leading-relaxed">
-							One size designed for a wide range of riders (5&#39;2&quot; – 6&#39;5&quot;). Contact us for fit guidance.
+							One size designed for a wide range of riders (5&#39;2&quot; – 6&#39;5&quot;). Contact us for fit
+							guidance.
 						</AccordionContent>
 					</AccordionItem>
 
@@ -242,7 +236,9 @@ export function ProductDetailContent({
 							<dl className="space-y-4 text-sm">
 								<div>
 									<dt className="font-medium text-foreground">What are the shipping costs?</dt>
-									<dd className="text-muted-foreground mt-1">Free shipping on all orders that include an eBike.</dd>
+									<dd className="text-muted-foreground mt-1">
+										Free shipping on all orders that include an eBike.
+									</dd>
 								</div>
 								<div>
 									<dt className="font-medium text-foreground">Can I return my order?</dt>
@@ -250,15 +246,21 @@ export function ProductDetailContent({
 								</div>
 								<div>
 									<dt className="font-medium text-foreground">Is it easy to assemble?</dt>
-									<dd className="text-muted-foreground mt-1">Yes, all of our eBikes are 95% assembled out of the box.</dd>
+									<dd className="text-muted-foreground mt-1">
+										Yes, all of our eBikes are 95% assembled out of the box.
+									</dd>
 								</div>
 								<div>
 									<dt className="font-medium text-foreground">Can I add a secondary battery later?</dt>
-									<dd className="text-muted-foreground mt-1">Yes, all models come standard with secondary battery ports.</dd>
+									<dd className="text-muted-foreground mt-1">
+										Yes, all models come standard with secondary battery ports.
+									</dd>
 								</div>
 								<div>
 									<dt className="font-medium text-foreground">What is the warranty?</dt>
-									<dd className="text-muted-foreground mt-1">All eBikes come with a standard 12-month warranty.</dd>
+									<dd className="text-muted-foreground mt-1">
+										All eBikes come with a standard 12-month warranty.
+									</dd>
 								</div>
 							</dl>
 						</AccordionContent>
@@ -278,33 +280,31 @@ export function ProductDetailContent({
 					<div className="overflow-x-auto -mx-4 px-4 sm:-mx-6 sm:px-6 lg:mx-0 lg:px-0 no-scrollbar">
 						<div className="flex gap-4 sm:gap-5 w-max">
 							{otherProducts.flatMap((op) =>
-								(ASSETS.catalogColorImages[op.slug] ?? []).map(
-									([front], i) => {
-										const name = COLOR_NAMES[i] ?? "Color";
-										return (
-											<Link
-												key={`${op.slug}-${name}`}
-												href={`/product/${op.slug}?color=${name.toLowerCase()}`}
-												className="flex flex-col shrink-0 w-[220px] sm:w-[260px] group"
-											>
-												<div className="relative aspect-square rounded-lg overflow-hidden">
-													<Image
-														src={front}
-														alt={`${op.name} ${name}`}
-														fill
-														sizes="260px"
-														className="object-contain group-hover:scale-105 transition-transform duration-300"
-														loading="lazy"
-													/>
-												</div>
-												<div className="mt-2 px-0.5">
-													<p className="text-sm font-medium text-foreground">{op.name}</p>
-													<p className="text-xs text-muted-foreground">{name}</p>
-												</div>
-											</Link>
-										);
-									},
-								),
+								(ASSETS.catalogColorImages[op.slug] ?? []).map(([front], i) => {
+									const name = COLOR_NAMES[i] ?? "Color";
+									return (
+										<Link
+											key={`${op.slug}-${name}`}
+											href={`/product/${op.slug}?color=${name.toLowerCase()}`}
+											className="flex flex-col shrink-0 w-[220px] sm:w-[260px] group"
+										>
+											<div className="relative aspect-square rounded-lg overflow-hidden">
+												<Image
+													src={front}
+													alt={`${op.name} ${name}`}
+													fill
+													sizes="260px"
+													className="object-contain group-hover:scale-105 transition-transform duration-300"
+													loading="lazy"
+												/>
+											</div>
+											<div className="mt-2 px-0.5">
+												<p className="text-sm font-medium text-foreground">{op.name}</p>
+												<p className="text-xs text-muted-foreground">{name}</p>
+											</div>
+										</Link>
+									);
+								}),
 							)}
 						</div>
 					</div>

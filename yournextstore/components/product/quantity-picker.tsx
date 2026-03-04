@@ -7,12 +7,7 @@ type QuantityPickerProps = {
 	max?: number;
 };
 
-export function QuantityPicker({
-	value,
-	onChange,
-	min = 1,
-	max = 10,
-}: QuantityPickerProps) {
+export function QuantityPicker({ value, onChange, min = 1, max = 10 }: QuantityPickerProps) {
 	return (
 		<div className="inline-flex items-center rounded-lg border border-foreground/20 overflow-hidden">
 			<button
@@ -24,9 +19,7 @@ export function QuantityPicker({
 			>
 				&minus;
 			</button>
-			<span className="w-10 text-center text-base font-medium text-foreground tabular-nums">
-				{value}
-			</span>
+			<span className="w-10 text-center text-base font-medium text-foreground tabular-nums">{value}</span>
 			<button
 				type="button"
 				onClick={() => onChange(Math.min(max, value + 1))}

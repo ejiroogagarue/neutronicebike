@@ -29,4 +29,4 @@ function createStubCommerce() {
 
 export const commerce = token
 	? Commerce({ token })
-	: (createStubCommerce() as ReturnType<typeof Commerce>);
+	: (createStubCommerce() as unknown as ReturnType<typeof Commerce>);

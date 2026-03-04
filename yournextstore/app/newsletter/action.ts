@@ -1,6 +1,7 @@
 "use server";
 
 import { commerce } from "@/lib/commerce";
+import { sendSupportLeadEmail } from "@/lib/support-email";
 
 type NewsletterState = {
 	success: boolean;
@@ -19,7 +20,17 @@ export async function subscribeToNewsletter(
 	}
 
 	try {
-		await commerce.subscriberCreate({ email });
+		await sendSupportLeadEmail({
+			source: "newsletter",
+			email,
+			pathname: "/",
+		});
+
+		try {
+			await commerce.subscriberCreate({ email });
+		} catch {
+			// Keep lead delivery successful even if commerce subscription is unavailable.
+		}
 
 		return { success: true, message: "Thanks for subscribing!" };
 	} catch {

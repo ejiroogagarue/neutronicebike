@@ -14,7 +14,6 @@ const nextConfig: NextConfig = {
 		root: process.cwd(),
 	},
 	experimental: {
-		typedEnv: true,
 		optimizePackageImports: [
 			"lucide-react",
 			"@radix-ui/react-accordion",
@@ -48,6 +47,15 @@ const nextConfig: NextConfig = {
 	},
 	images: {
 		remotePatterns: [{ protocol: "https", hostname: "**" }],
+	},
+	async redirects() {
+		return [
+			{
+				source: "/products",
+				destination: "/catalog",
+				permanent: true,
+			},
+		];
 	},
 };
 

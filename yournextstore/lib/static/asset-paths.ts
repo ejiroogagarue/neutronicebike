@@ -114,20 +114,68 @@ export const ASSETS = {
 	 */
 	productDetailColorImages: {
 		"excalibur-journey": [
-			["/ProductDetail/ExcaliburJourney/Yellow/FrontView.jpg", "/ProductDetail/ExcaliburJourney/Yellow/SideView.jpg", "/ProductDetail/ExcaliburJourney/Yellow/BackView.jpg"],
-			["/ProductDetail/ExcaliburJourney/Red/FrontView.jpg", "/ProductDetail/ExcaliburJourney/Red/SideView.jpg", "/ProductDetail/ExcaliburJourney/Red/BackView.jpg"],
-			["/ProductDetail/ExcaliburJourney/Green/FrontView.jpg", "/ProductDetail/ExcaliburJourney/Green/SideView.jpg", "/ProductDetail/ExcaliburJourney/Green/BackView.jpg"],
-			["/ProductDetail/ExcaliburJourney/Blue/FrontView.jpg", "/ProductDetail/ExcaliburJourney/Blue/SideView.jpg", "/ProductDetail/ExcaliburJourney/Blue/BackView.jpg"],
-			["/ProductDetail/ExcaliburJourney/Brown/FrontView.jpg", "/ProductDetail/ExcaliburJourney/Brown/SideView.jpg", "/ProductDetail/ExcaliburJourney/Brown/BackView.jpg"],
-			["/ProductDetail/ExcaliburJourney/Black/FrontView.jpg", "/ProductDetail/ExcaliburJourney/Black/SideView.jpg", "/ProductDetail/ExcaliburJourney/Black/BackView.jpg"],
+			[
+				"/ProductDetail/ExcaliburJourney/Yellow/FrontView.jpg",
+				"/ProductDetail/ExcaliburJourney/Yellow/SideView.jpg",
+				"/ProductDetail/ExcaliburJourney/Yellow/BackView.jpg",
+			],
+			[
+				"/ProductDetail/ExcaliburJourney/Red/FrontView.jpg",
+				"/ProductDetail/ExcaliburJourney/Red/SideView.jpg",
+				"/ProductDetail/ExcaliburJourney/Red/BackView.jpg",
+			],
+			[
+				"/ProductDetail/ExcaliburJourney/Green/FrontView.jpg",
+				"/ProductDetail/ExcaliburJourney/Green/SideView.jpg",
+				"/ProductDetail/ExcaliburJourney/Green/BackView.jpg",
+			],
+			[
+				"/ProductDetail/ExcaliburJourney/Blue/FrontView.jpg",
+				"/ProductDetail/ExcaliburJourney/Blue/SideView.jpg",
+				"/ProductDetail/ExcaliburJourney/Blue/BackView.jpg",
+			],
+			[
+				"/ProductDetail/ExcaliburJourney/Brown/FrontView.jpg",
+				"/ProductDetail/ExcaliburJourney/Brown/SideView.jpg",
+				"/ProductDetail/ExcaliburJourney/Brown/BackView.jpg",
+			],
+			[
+				"/ProductDetail/ExcaliburJourney/Black/FrontView.jpg",
+				"/ProductDetail/ExcaliburJourney/Black/SideView.jpg",
+				"/ProductDetail/ExcaliburJourney/Black/BackView.jpg",
+			],
 		],
 		"excalibur-hunter": [
-			["/ProductDetail/ExcaliburHunter/Yellow/FrontView.jpg", "/ProductDetail/ExcaliburHunter/Yellow/SideView.jpg", "/ProductDetail/ExcaliburHunter/Yellow/BackView.jpg"],
-			["/ProductDetail/ExcaliburHunter/Red/FrontView.jpg", "/ProductDetail/ExcaliburHunter/Red/SideView.jpg", "/ProductDetail/ExcaliburHunter/Red/BackView.jpg"],
-			["/ProductDetail/ExcaliburHunter/Green/FrontView.jpg", "/ProductDetail/ExcaliburHunter/Green/SideView.jpg", "/ProductDetail/ExcaliburHunter/Green/BackView.jpg"],
-			["/ProductDetail/ExcaliburHunter/Blue/FrontView.jpg", "/ProductDetail/ExcaliburHunter/Blue/SideView.jpg", "/ProductDetail/ExcaliburHunter/Blue/BackView.jpg"],
-			["/ProductDetail/ExcaliburHunter/Brown/FrontView.jpg", "/ProductDetail/ExcaliburHunter/Brown/SideView.jpg", "/ProductDetail/ExcaliburHunter/Brown/BackView.jpg"],
-			["/ProductDetail/ExcaliburHunter/Black/FrontView.jpg", "/ProductDetail/ExcaliburHunter/Black/SideView.jpg", "/ProductDetail/ExcaliburHunter/Black/BackView.jpg"],
+			[
+				"/ProductDetail/ExcaliburHunter/Yellow/FrontView.jpg",
+				"/ProductDetail/ExcaliburHunter/Yellow/SideView.jpg",
+				"/ProductDetail/ExcaliburHunter/Yellow/BackView.jpg",
+			],
+			[
+				"/ProductDetail/ExcaliburHunter/Red/FrontView.jpg",
+				"/ProductDetail/ExcaliburHunter/Red/SideView.jpg",
+				"/ProductDetail/ExcaliburHunter/Red/BackView.jpg",
+			],
+			[
+				"/ProductDetail/ExcaliburHunter/Green/FrontView.jpg",
+				"/ProductDetail/ExcaliburHunter/Green/SideView.jpg",
+				"/ProductDetail/ExcaliburHunter/Green/BackView.jpg",
+			],
+			[
+				"/ProductDetail/ExcaliburHunter/Blue/FrontView.jpg",
+				"/ProductDetail/ExcaliburHunter/Blue/SideView.jpg",
+				"/ProductDetail/ExcaliburHunter/Blue/BackView.jpg",
+			],
+			[
+				"/ProductDetail/ExcaliburHunter/Brown/FrontView.jpg",
+				"/ProductDetail/ExcaliburHunter/Brown/SideView.jpg",
+				"/ProductDetail/ExcaliburHunter/Brown/BackView.jpg",
+			],
+			[
+				"/ProductDetail/ExcaliburHunter/Black/FrontView.jpg",
+				"/ProductDetail/ExcaliburHunter/Black/SideView.jpg",
+				"/ProductDetail/ExcaliburHunter/Black/BackView.jpg",
+			],
 		],
 	} as Record<string, string[][]>,
 

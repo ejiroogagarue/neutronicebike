@@ -16,7 +16,6 @@ export function Hero() {
 						</p>
 						<div className="mt-10 flex flex-col sm:flex-row gap-4">
 							<YnsLink
-								prefetch={"eager"}
 								href="#products"
 								className="inline-flex items-center justify-center gap-2 h-12 px-8 bg-foreground text-primary-foreground rounded-full text-base font-medium hover:bg-foreground/90 transition-colors"
 							>
@@ -24,7 +23,6 @@ export function Hero() {
 								<ArrowRightIcon className="h-4 w-4" />
 							</YnsLink>
 							<YnsLink
-								prefetch={"eager"}
 								href="#about"
 								className="inline-flex items-center justify-center gap-2 h-12 px-8 border border-border rounded-full text-base font-medium hover:bg-secondary transition-colors"
 							>

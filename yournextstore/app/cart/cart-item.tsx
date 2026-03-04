@@ -58,7 +58,6 @@ export function CartItem({ item }: CartItemProps) {
 		<div className="flex gap-3 py-4">
 			{/* Product Image */}
 			<YnsLink
-				prefetch={"eager"}
 				href={`/product/${product.slug}`}
 				onClick={closeCart}
 				className="relative h-24 w-24 shrink-0 overflow-hidden rounded-lg bg-secondary"
@@ -70,7 +69,6 @@ export function CartItem({ item }: CartItemProps) {
 			<div className="flex min-w-0 flex-1 flex-col justify-between py-0.5">
 				<div className="flex items-start justify-between gap-2">
 					<YnsLink
-						prefetch={"eager"}
 						href={`/product/${product.slug}`}
 						onClick={closeCart}
 						className="text-sm font-medium leading-tight text-foreground hover:underline line-clamp-2"
@@ -98,7 +96,9 @@ export function CartItem({ item }: CartItemProps) {
 						>
 							<Minus className="h-4 w-4" />
 						</button>
-						<span className="flex min-h-[44px] min-w-8 items-center justify-center text-sm tabular-nums px-1">{quantity}</span>
+						<span className="flex min-h-[44px] min-w-8 items-center justify-center text-sm tabular-nums px-1">
+							{quantity}
+						</span>
 						<button
 							type="button"
 							onClick={handleIncrement}

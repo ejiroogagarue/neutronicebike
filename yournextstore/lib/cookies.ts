@@ -48,7 +48,8 @@ export async function getStaticCartCookie(): Promise<StaticCartItem[]> {
 		const parsed = raw ? (JSON.parse(raw) as StaticCartCookieJson) : null;
 		if (!parsed || !Array.isArray(parsed.items)) return [];
 		return parsed.items.filter(
-			(i): i is StaticCartItem => typeof i?.variantId === "string" && typeof i?.quantity === "number" && i.quantity > 0,
+			(i): i is StaticCartItem =>
+				typeof i?.variantId === "string" && typeof i?.quantity === "number" && i.quantity > 0,
 		);
 	} catch {
 		return [];

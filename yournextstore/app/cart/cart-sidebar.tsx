@@ -1,11 +1,19 @@
 "use client";
 
 import { ShoppingBag } from "lucide-react";
+import Link from "next/link";
 import { useCart } from "@/app/cart/cart-context";
 import { CartItem } from "@/app/cart/cart-item";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Sheet, SheetContent, SheetFooter, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import {
+	Sheet,
+	SheetContent,
+	SheetDescription,
+	SheetFooter,
+	SheetHeader,
+	SheetTitle,
+} from "@/components/ui/sheet";
 import { CURRENCY, LOCALE } from "@/lib/constants";
 import { formatMoney } from "@/lib/money";
 
@@ -24,6 +32,9 @@ export function CartSidebar() {
 							<span className="text-sm font-normal text-muted-foreground">({itemCount} items)</span>
 						)}
 					</SheetTitle>
+					<SheetDescription className="sr-only">
+						View and edit items in your shopping cart before checkout.
+					</SheetDescription>
 				</SheetHeader>
 
 				{items.length === 0 ? (
@@ -58,10 +69,13 @@ export function CartSidebar() {
 									</span>
 								</div>
 								<p className="text-xs text-muted-foreground">Shipping and taxes calculated at checkout</p>
-								<Button asChild className="w-full min-h-[48px] text-base font-semibold bg-primary text-primary-foreground hover:opacity-90">
-									<a href={checkoutUrl} onClick={closeCart}>
+								<Button
+									asChild
+									className="w-full min-h-[48px] text-base font-semibold bg-primary text-primary-foreground hover:opacity-90"
+								>
+									<Link href={checkoutUrl} onClick={closeCart} prefetch>
 										Checkout
-									</a>
+									</Link>
 								</Button>
 								<button
 									type="button"

@@ -23,10 +23,7 @@ export function HoverGallery({
 	aspectClassName = "aspect-square sm:aspect-4/5 lg:aspect-square",
 }: HoverGalleryProps) {
 	return (
-		<div
-			className="group relative w-full"
-			aria-label={`${alt}, hover to view back`}
-		>
+		<div className="group relative w-full">
 			<div className={`relative w-full ${aspectClassName}`}>
 				<Image
 					src={frontSrc}

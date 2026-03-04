@@ -3,10 +3,11 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { ASSETS } from "@/lib/static/asset-paths";
 import { RentalSignupForm } from "@/components/sections/rental-signup-form";
+import { ASSETS } from "@/lib/static/asset-paths";
 
 export function RentalHero() {
+	const mediaRootRef = useRef<HTMLDivElement>(null);
 	const videoRef = useRef<HTMLVideoElement>(null);
 	const [videoLoaded, setVideoLoaded] = useState(false);
 	const [inView, setInView] = useState(false);
@@ -21,25 +22,33 @@ export function RentalHero() {
 	}, []);
 
 	useEffect(() => {
-		const el = videoRef.current;
+		const el = mediaRootRef.current;
 		if (!el) return;
-		const obs = new IntersectionObserver(
-			([e]) => setInView(e.isIntersecting),
-			{ rootMargin: "50px", threshold: 0.1 }
-		);
+		const obs = new IntersectionObserver(([e]) => setInView(e.isIntersecting), {
+			rootMargin: "120px",
+			threshold: 0.1,
+		});
 		obs.observe(el);
 		return () => obs.disconnect();
 	}, []);
 
 	useEffect(() => {
-		if (prefersReducedMotion || !inView || !videoRef.current) return;
-		videoRef.current.play().catch(() => {});
+		const v = videoRef.current;
+		if (!v) return;
+		if (prefersReducedMotion || !inView) {
+			v.pause();
+			return;
+		}
+		v.play().catch(() => {});
 	}, [inView, prefersReducedMotion]);
 
 	return (
-		<header className="relative min-h-[80vh] flex items-center justify-center overflow-hidden bg-[#010101]" style={{ minHeight: "80dvh" }}>
+		<header
+			className="relative min-h-[80vh] flex items-center justify-center overflow-hidden bg-[#010101]"
+			style={{ minHeight: "80dvh" }}
+		>
 			{/* Fixed aspect area for poster/video — CLS-safe */}
-			<div className="absolute inset-0 min-h-[80vh]">
+			<div ref={mediaRootRef} className="absolute inset-0 min-h-[80vh]">
 				<Image
 					src={ASSETS.rental.poster}
 					alt=""
@@ -50,19 +59,21 @@ export function RentalHero() {
 					fetchPriority="high"
 					unoptimized={ASSETS.rental.poster.startsWith("/videos/")}
 				/>
-				<video
-					ref={videoRef}
-					className="absolute inset-0 w-full h-full object-cover opacity-0 data-ready:opacity-100 transition-opacity duration-500"
-					muted
-					playsInline
-					loop
-					preload="none"
-					onLoadedData={() => setVideoLoaded(true)}
-					data-ready={videoLoaded ? "" : undefined}
-				>
-					{ASSETS.rental.webm && <source src={ASSETS.rental.webm} type="video/webm" />}
-					<source src={ASSETS.rental.mp4} type="video/mp4" />
-				</video>
+				{inView && !prefersReducedMotion && (
+					<video
+						ref={videoRef}
+						className="absolute inset-0 w-full h-full object-cover opacity-0 data-ready:opacity-100 transition-opacity duration-500"
+						muted
+						playsInline
+						loop
+						preload="none"
+						onLoadedData={() => setVideoLoaded(true)}
+						data-ready={videoLoaded ? "" : undefined}
+					>
+						{ASSETS.rental.webm && <source src={ASSETS.rental.webm} type="video/webm" />}
+						<source src={ASSETS.rental.mp4} type="video/mp4" />
+					</video>
+				)}
 				<div className="absolute inset-0 bg-black/40" aria-hidden />
 			</div>
 			<div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center w-full">

@@ -1,8 +1,33 @@
+import type { Metadata } from "next";
 import { cacheLife } from "next/cache";
 import { notFound } from "next/navigation";
 import { commerce } from "@/lib/commerce";
 
-export default async function LegalPage(props: { params: Promise<{ slug: string }> }) {
+type LegalPageProps = {
+	params: Promise<{ slug: string }>;
+};
+
+export async function generateMetadata(props: LegalPageProps): Promise<Metadata> {
+	const { slug } = await props.params;
+	const page = await commerce.legalPageGet(slug);
+	const title = page?.title ?? "Legal — Neutronic";
+
+	return {
+		title: `${title} — Neutronic`,
+		description: `Read Neutronic's ${title.toLowerCase()}.`,
+		alternates: {
+			canonical: `/legal/${slug}`,
+		},
+		openGraph: {
+			title: `${title} — Neutronic`,
+			description: `Read Neutronic's ${title.toLowerCase()}.`,
+			url: `/legal/${slug}`,
+			type: "article",
+		},
+	};
+}
+
+export default async function LegalPage(props: LegalPageProps) {
 	"use cache";
 	cacheLife("hours");
 

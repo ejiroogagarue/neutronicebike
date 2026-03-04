@@ -15,15 +15,8 @@ type HeroVideoProps = {
 	ctaSecondary?: { label: string; href: string };
 };
 
-export function HeroVideo({
-	poster,
-	mp4,
-	webm,
-	title,
-	subtitle,
-	ctaPrimary,
-	ctaSecondary,
-}: HeroVideoProps) {
+export function HeroVideo({ poster, mp4, webm, title, subtitle, ctaPrimary, ctaSecondary }: HeroVideoProps) {
+	const mediaRootRef = useRef<HTMLDivElement>(null);
 	const videoRef = useRef<HTMLVideoElement>(null);
 	const [videoLoaded, setVideoLoaded] = useState(false);
 	const [inView, setInView] = useState(false);
@@ -38,27 +31,31 @@ export function HeroVideo({
 	}, []);
 
 	useEffect(() => {
-		const el = videoRef.current;
+		const el = mediaRootRef.current;
 		if (!el) return;
 		const obs = new IntersectionObserver(
 			([e]) => {
 				setInView(e.isIntersecting);
 			},
-			{ rootMargin: "50px", threshold: 0.1 }
+			{ rootMargin: "120px", threshold: 0.1 },
 		);
 		obs.observe(el);
 		return () => obs.disconnect();
 	}, []);
 
 	useEffect(() => {
-		if (prefersReducedMotion || !inView || !videoRef.current) return;
 		const v = videoRef.current;
+		if (!v) return;
+		if (prefersReducedMotion || !inView) {
+			v.pause();
+			return;
+		}
 		v.play().catch(() => {});
 	}, [inView, prefersReducedMotion]);
 
 	return (
 		<header className="relative flex-1 min-h-[60vh] flex items-center justify-center overflow-hidden bg-[#010101]">
-			<div className="absolute inset-0 bg-[#010101]">
+			<div ref={mediaRootRef} className="absolute inset-0 bg-[#010101]">
 				{poster ? (
 					<Image
 						src={poster}
@@ -70,19 +67,21 @@ export function HeroVideo({
 						unoptimized={poster.startsWith("/videos/")}
 					/>
 				) : null}
-				<video
-					ref={videoRef}
-					className="absolute inset-0 w-full h-full object-cover opacity-0 data-ready:opacity-100 transition-opacity duration-500"
-					muted
-					playsInline
-					loop
-					preload="none"
-					onLoadedData={() => setVideoLoaded(true)}
-					data-ready={videoLoaded ? "" : undefined}
-				>
-					{webm ? <source src={webm} type="video/webm" /> : null}
-					<source src={mp4} type="video/mp4" />
-				</video>
+				{inView && !prefersReducedMotion && (
+					<video
+						ref={videoRef}
+						className="absolute inset-0 w-full h-full object-cover opacity-0 data-ready:opacity-100 transition-opacity duration-500"
+						muted
+						playsInline
+						loop
+						preload="none"
+						onLoadedData={() => setVideoLoaded(true)}
+						data-ready={videoLoaded ? "" : undefined}
+					>
+						{webm ? <source src={webm} type="video/webm" /> : null}
+						<source src={mp4} type="video/mp4" />
+					</video>
+				)}
 				<div className="absolute inset-0 bg-black/40" aria-hidden />
 			</div>
 

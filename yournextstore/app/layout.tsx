@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { Suspense } from "react";
+import { ConvexClientProvider } from "@/app/ConvexClientProvider";
 import { CartProvider } from "@/app/cart/cart-context";
 import { CartSidebar } from "@/app/cart/cart-sidebar";
 import { Footer } from "@/app/footer";
@@ -11,17 +12,39 @@ import { Navbar } from "@/app/navbar";
 import { ErrorOverlayRemover, NavigationReporter } from "@/components/devtools";
 import { FontLoader } from "@/components/font-loader";
 import { ReferralBadge } from "@/components/referral-badge";
-import { getCartCookieJson } from "@/lib/cookies";
 import { commerce } from "@/lib/commerce";
+import { getCartCookieJson } from "@/lib/cookies";
 import { ASSETS } from "@/lib/static/asset-paths";
 
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/+$/, "") ?? "http://localhost:3000";
+
 export const metadata: Metadata = {
+	metadataBase: new URL(siteUrl),
 	title: "Neutronic — Courier-tough eBikes",
 	description:
 		"Courier-tough eBikes, built for bad streets and worse weather. Excalibur Journey & Hunter. Buy or rent.",
+	openGraph: {
+		title: "Neutronic — Courier-tough eBikes",
+		description:
+			"Courier-tough eBikes, built for bad streets and worse weather. Excalibur Journey & Hunter. Buy or rent.",
+		url: siteUrl,
+		siteName: "Neutronic",
+		type: "website",
+	},
+	twitter: {
+		card: "summary_large_image",
+		title: "Neutronic — Courier-tough eBikes",
+		description:
+			"Courier-tough eBikes, built for bad streets and worse weather. Excalibur Journey & Hunter. Buy or rent.",
+	},
 };
 
 async function getInitialCart() {
+	// In static/Stripe-first mode, skip backend cart fetches to keep routing fast.
+	if (!process.env.YNS_API_KEY) {
+		return { cart: null, cartId: null };
+	}
+
 	const cartCookie = await getCartCookieJson();
 
 	if (!cartCookie?.id) {
@@ -93,9 +116,11 @@ export default function RootLayout({
 			</head>
 			<body className="antialiased">
 				<FontLoader />
-				<Suspense>
-					<CartProviderWrapper>{children}</CartProviderWrapper>
-				</Suspense>
+				<ConvexClientProvider>
+					<Suspense>
+						<CartProviderWrapper>{children}</CartProviderWrapper>
+					</Suspense>
+				</ConvexClientProvider>
 				{env === "development" && (
 					<>
 						<NavigationReporter />

@@ -1,11 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { getRentalPlans } from "@/lib/static/rental-plans";
+import { BUTTON_PILL_PRIMARY, FORM_SELECT_CLASS } from "@/lib/ui-classes";
 
 type RentalSignupFormProps = {
 	/** Prefilled plan e.g. "gig-economy" (optional; also read from ?plan=) */
@@ -36,11 +37,28 @@ export function RentalSignupForm({
 		e.preventDefault();
 		if (!email.trim()) return;
 		setStatus("loading");
-		// TODO: send to API / Convex (lead or rental_signups collection)
-		await new Promise((r) => setTimeout(r, 600));
-		setStatus("success");
-		setEmail("");
-		setPlanId("");
+		try {
+			const response = await fetch("/api/support-leads", {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({
+					source: "rental",
+					email,
+					planId: planId || undefined,
+					pathname: window.location.pathname,
+				}),
+			});
+
+			if (!response.ok) {
+				throw new Error("Failed to submit rental lead.");
+			}
+
+			setStatus("success");
+			setEmail("");
+			setPlanId("");
+		} catch {
+			setStatus("error");
+		}
 	};
 
 	if (variant === "hero") {
@@ -66,7 +84,7 @@ export function RentalSignupForm({
 				<Button
 					type="submit"
 					disabled={status === "loading" || status === "success"}
-					className="min-h-[44px] px-6 rounded-full font-semibold bg-foreground text-primary hover:bg-foreground/90"
+					className={`${BUTTON_PILL_PRIMARY} min-h-[44px] bg-foreground text-primary hover:bg-foreground/90`}
 				>
 					{status === "success" ? "Done" : status === "loading" ? "Sending…" : "Notify me"}
 				</Button>
@@ -104,7 +122,7 @@ export function RentalSignupForm({
 					value={planId}
 					onChange={(e) => setPlanId(e.target.value)}
 					disabled={status === "loading" || status === "success"}
-					className="flex h-12 w-full rounded-lg border border-input bg-background px-3 py-2 text-base shadow-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50"
+					className={FORM_SELECT_CLASS}
 				>
 					<option value="">Select a plan</option>
 					{plans.map((p) => (
@@ -117,17 +135,18 @@ export function RentalSignupForm({
 			<Button
 				type="submit"
 				disabled={status === "loading" || status === "success" || !email.trim()}
-				className="min-h-[48px] w-full rounded-full text-base font-semibold bg-foreground text-primary hover:bg-foreground/90"
+				className={`${BUTTON_PILL_PRIMARY} w-full bg-foreground text-primary hover:bg-foreground/90`}
 			>
-				{status === "success"
-					? "We'll be in touch"
-					: status === "loading"
-						? "Sending…"
-						: "Get started"}
+				{status === "success" ? "We'll be in touch" : status === "loading" ? "Sending…" : "Get started"}
 			</Button>
 			{status === "success" && (
 				<p className="text-sm text-muted-foreground text-center">
 					Thanks! We&apos;ll send you the next steps shortly.
+				</p>
+			)}
+			{status === "error" && (
+				<p className="text-sm text-destructive text-center">
+					We couldn&apos;t submit your request. Please try again.
 				</p>
 			)}
 		</form>

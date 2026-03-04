@@ -1,5 +1,5 @@
-import Link from "next/link";
 import Image from "next/image";
+import Link from "next/link";
 import type { StaticProduct } from "@/lib/static/products";
 import { formatPrice } from "@/lib/static/products";
 
@@ -9,11 +9,7 @@ type Props = {
 	viewAllHref?: string;
 };
 
-export function NeutronicProductGrid({
-	products,
-	title = "Bikes",
-	viewAllHref = "/catalog",
-}: Props) {
+export function NeutronicProductGrid({ products, title = "Bikes", viewAllHref = "/catalog" }: Props) {
 	return (
 		<section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
 			{(title || viewAllHref) && (
@@ -34,11 +30,7 @@ export function NeutronicProductGrid({
 				{products.map((product) => {
 					const image = product.images[0] ?? "/images/placeholder.svg";
 					return (
-						<Link
-							key={product.id}
-							href={`/product/${product.slug}`}
-							className="group block"
-						>
+						<Link key={product.id} href={`/product/${product.slug}`} className="group block">
 							<div className="relative aspect-square bg-muted rounded-2xl overflow-hidden mb-4">
 								<Image
 									src={image}

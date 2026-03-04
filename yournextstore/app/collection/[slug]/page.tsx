@@ -1,4 +1,5 @@
 import type { APICollectionGetByIdResult } from "commerce-kit";
+import type { Metadata } from "next";
 import { cacheLife } from "next/cache";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
@@ -70,6 +71,45 @@ function CollectionProducts({ collection }: { collection: APICollectionGetByIdRe
 			showViewAll={false}
 		/>
 	);
+}
+
+export async function generateMetadata(props: PageProps<"/collection/[slug]">): Promise<Metadata> {
+	const { slug } = await props.params;
+	const collection = await commerce.collectionGet({ idOrSlug: slug });
+
+	if (!collection) {
+		return {
+			title: "Collection not found — Neutronic",
+		};
+	}
+
+	const safeDescription = `${collection.description ?? ""}`.trim();
+	const description =
+		safeDescription.length > 0
+			? safeDescription
+			: `Explore the ${collection.name} collection from Neutronic.`;
+	const canonical = `/collection/${collection.slug || slug}`;
+
+	return {
+		title: `${collection.name} — Neutronic`,
+		description,
+		alternates: {
+			canonical,
+		},
+		openGraph: {
+			title: `${collection.name} — Neutronic`,
+			description,
+			url: canonical,
+			type: "website",
+			images: collection.image ? [{ url: collection.image, alt: collection.name }] : undefined,
+		},
+		twitter: {
+			card: "summary_large_image",
+			title: `${collection.name} — Neutronic`,
+			description,
+			images: collection.image ? [collection.image] : undefined,
+		},
+	};
 }
 
 export default async function CollectionPage(props: PageProps<"/collection/[slug]">) {

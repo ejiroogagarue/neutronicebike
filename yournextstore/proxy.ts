@@ -6,6 +6,11 @@ export async function proxy(request: NextRequest) {
 	const { store, publicUrl } = await commerce.meGet();
 	const destinationUrl = new URL(publicUrl);
 
+	// Skip proxying when using stub commerce (YNS_API_KEY not set) — serve local Stripe checkout instead
+	if (destinationUrl.hostname === "example.com") {
+		return NextResponse.next();
+	}
+
 	// Clone the request headers and set the correct x-forwarded-host
 	const requestHeaders = new Headers(request.headers);
 	requestHeaders.set("x-forwarded-host", destinationUrl.host);

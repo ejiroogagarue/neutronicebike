@@ -26,7 +26,6 @@ export const staticAccessories: StaticAccessory[] = [
 			"/AccessoriesPage/RhinoBattery/05.webp",
 		],
 		highlights: ["Range extender", "Courier-friendly upgrade", "Compatibility confirmation required"],
-		stripePriceId: "price_TODO_accessory_rhino_battery",
 	},
 	{
 		id: "kirin-battery",
@@ -41,7 +40,6 @@ export const staticAccessories: StaticAccessory[] = [
 			"/AccessoriesPage/KirinBattery/03.webp",
 		],
 		highlights: ["Battery accessory", "Availability varies", "Confirm fitment before purchase"],
-		stripePriceId: "price_TODO_accessory_kirin_battery",
 	},
 ];
 
@@ -52,4 +50,3 @@ export function getStaticAccessories(): StaticAccessory[] {
 export function getAccessoryBySlug(slug: string): StaticAccessory | undefined {
 	return staticAccessories.find((a) => a.slug === slug);
 }
-

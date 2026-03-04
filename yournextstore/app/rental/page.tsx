@@ -1,16 +1,27 @@
+import { ArrowRightIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { Suspense } from "react";
-import { ArrowRightIcon } from "lucide-react";
-import { getRentalPlans, formatRentalPrice } from "@/lib/static/rental-plans";
-import { ASSETS } from "@/lib/static/asset-paths";
+import { HomeProductBlock } from "@/components/sections/home-product-block";
 import { RentalHero } from "@/components/sections/rental-hero";
 import { RentalSignupForm } from "@/components/sections/rental-signup-form";
-import { HomeProductBlock } from "@/components/sections/home-product-block";
+import { ASSETS } from "@/lib/static/asset-paths";
+import { formatRentalPrice, getRentalPlans } from "@/lib/static/rental-plans";
+import {
+	BODY_COPY,
+	BUTTON_PILL_PRIMARY,
+	HEADING_SECTION,
+	SECTION_CONTAINER,
+	SECTION_DIVIDER_TOP,
+	SECTION_Y,
+} from "@/lib/ui-classes";
 
 export const metadata = {
 	title: "Rental — Neutronic",
 	description: "High-performance e-bike rentals for modern couriers. Excalibur rentals.",
+	alternates: {
+		canonical: "/rental",
+	},
 };
 
 /** Exact pill + body from product-detail Key Features (reference) */
@@ -30,10 +41,7 @@ export default function RentalPage() {
 			<section className="w-full" aria-labelledby="hustle-heading">
 				<div className="bg-primary flex flex-col gap-2.5 py-[1.5%] px-[5%] rounded-b-xl sm:rounded-none min-h-0">
 					<div className="max-w-7xl mx-auto w-full flex flex-col gap-2.5 min-w-0">
-						<h2
-							id="hustle-heading"
-							className="text-primary-foreground text-xl sm:text-2xl font-bold italic"
-						>
+						<h2 id="hustle-heading" className="text-primary-foreground text-xl sm:text-2xl font-bold italic">
 							Built For The Hustle
 						</h2>
 						<p className="text-primary-foreground text-[1rem] sm:text-[1.1rem] font-medium leading-relaxed max-w-2xl">
@@ -48,16 +56,12 @@ export default function RentalPage() {
 				</div>
 			</section>
 
-			<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-10">
+			<div className={`${SECTION_CONTAINER} ${SECTION_Y}`}>
 				{/* Plans — information only: pill + price + features + CTA, no image placeholder */}
-				<section
-					id="plans"
-					className="mt-6 sm:mt-8 lg:mt-10 border-t border-border pt-5 sm:pt-6 lg:pt-8"
-					aria-labelledby="plans-heading"
-				>
+				<section id="plans" className={SECTION_DIVIDER_TOP} aria-labelledby="plans-heading">
 					<h2
 						id="plans-heading"
-						className="text-lg sm:text-xl lg:text-2xl font-semibold text-foreground mb-4 sm:mb-6 uppercase tracking-wide"
+						className={`${HEADING_SECTION} text-foreground mb-4 sm:mb-6 uppercase tracking-wide`}
 					>
 						Pick a plan that matches your schedule
 					</h2>
@@ -79,9 +83,7 @@ export default function RentalPage() {
 										<p className={`${yellowBodyClass} font-semibold text-foreground`}>
 											{formatRentalPrice(plan.price)}/week
 										</p>
-										{plan.description && (
-											<p className={yellowBodyClass}>{plan.description}</p>
-										)}
+										{plan.description && <p className={yellowBodyClass}>{plan.description}</p>}
 										<ul className={`${yellowBodyClass} list-disc list-inside space-y-1 pb-2`}>
 											{plan.features.map((f) => (
 												<li key={f}>{f}</li>
@@ -89,7 +91,7 @@ export default function RentalPage() {
 										</ul>
 										<Link
 											href={`/rental?plan=${plan.id}#signup`}
-											className="mt-auto inline-flex items-center justify-center min-h-[44px] sm:min-h-[48px] w-full rounded-full bg-foreground text-primary font-semibold text-sm sm:text-base hover:opacity-90 transition-opacity focus:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2 focus-visible:ring-offset-primary"
+											className={`${BUTTON_PILL_PRIMARY} mt-auto w-full bg-foreground text-primary focus-visible:ring-foreground focus-visible:ring-offset-primary`}
 										>
 											Get started
 										</Link>
@@ -104,40 +106,41 @@ export default function RentalPage() {
 			{/* Signup — full-width section, content constrained inside */}
 			<section
 				id="signup"
-				className="w-full mt-6 sm:mt-8 lg:mt-10 border-t border-border pt-5 sm:pt-6 lg:pt-8 bg-[#fdfdfd]"
+				className={`w-full ${SECTION_DIVIDER_TOP} bg-[#fdfdfd]`}
 				aria-labelledby="signup-heading"
 			>
-				<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-10">
-					<h2 id="signup-heading" className="text-lg sm:text-xl lg:text-2xl font-semibold text-foreground mb-2">
+				<div className={`${SECTION_CONTAINER} ${SECTION_Y}`}>
+					<h2 id="signup-heading" className={`${HEADING_SECTION} text-foreground mb-2`}>
 						Get started
 					</h2>
-					<p className="text-muted-foreground text-sm sm:text-base mb-4 sm:mb-6 max-w-xl">
-						We&apos;ll send you the next steps and confirm your plan. No commitment until you pick up
-						your bike.
+					<p className={`${BODY_COPY} mb-4 sm:mb-6 max-w-xl`}>
+						We&apos;ll send you the next steps and confirm your plan. No commitment until you pick up your
+						bike.
 					</p>
 					<div className="max-w-md w-full min-h-[280px] sm:min-h-[300px]">
-						<Suspense fallback={<div className="h-[280px] sm:h-[300px] animate-pulse rounded-lg bg-muted" aria-hidden />}>
+						<Suspense
+							fallback={
+								<div className="h-[280px] sm:h-[300px] animate-pulse rounded-lg bg-muted" aria-hidden />
+							}
+						>
 							<RentalSignupForm variant="signup" />
 						</Suspense>
 					</div>
 				</div>
 			</section>
 
-			<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-6 sm:pb-8 lg:pb-10">
+			<div className={`${SECTION_CONTAINER} pb-6 sm:pb-8 lg:pb-10`}>
 				{/* How rental works — info only, no image blocks */}
-				<section
-					className="mt-6 sm:mt-8 lg:mt-10 border-t border-border pt-5 sm:pt-6 lg:pt-8"
-					aria-labelledby="how-heading"
-				>
-					<h2 id="how-heading" className="text-lg sm:text-xl lg:text-2xl font-semibold text-foreground mb-4 sm:mb-6">
+				<section className={SECTION_DIVIDER_TOP} aria-labelledby="how-heading">
+					<h2 id="how-heading" className={`${HEADING_SECTION} text-foreground mb-4 sm:mb-6`}>
 						How rental works
 					</h2>
 					<div className="flex flex-col lg:flex-row items-stretch lg:items-center gap-4 lg:gap-2">
 						<div className="rounded-2xl overflow-hidden flex flex-col flex-1 min-w-0 min-h-[120px] sm:min-h-0 bg-primary text-primary-foreground pt-2 sm:pt-2.5 pb-3 sm:pb-4">
 							<h3 className={pillTitleClass}>1. Choose your plan</h3>
 							<p className={yellowBodyClass}>
-								Pick weekly, monthly, or annual depending on how often you ride and how serious
-								your hustle is.
+								Pick weekly, monthly, or annual depending on how often you ride and how serious your hustle
+								is.
 							</p>
 						</div>
 						<ArrowRightIcon
@@ -147,8 +150,7 @@ export default function RentalPage() {
 						<div className="rounded-2xl overflow-hidden flex flex-col flex-1 min-w-0 min-h-[120px] sm:min-h-0 bg-primary text-primary-foreground pt-2 sm:pt-2.5 pb-3 sm:pb-4">
 							<h3 className={pillTitleClass}>2. Pick up your Excalibur</h3>
 							<p className={yellowBodyClass}>
-								We set up the bike, fit you, and walk you through controls, charging, and best
-								practices.
+								We set up the bike, fit you, and walk you through controls, charging, and best practices.
 							</p>
 						</div>
 						<ArrowRightIcon
@@ -158,8 +160,8 @@ export default function RentalPage() {
 						<div className="rounded-2xl overflow-hidden flex flex-col flex-1 min-w-0 min-h-[120px] sm:min-h-0 bg-primary text-primary-foreground pt-2 sm:pt-2.5 pb-3 sm:pb-4">
 							<h3 className={pillTitleClass}>3. Ride and earn</h3>
 							<p className={yellowBodyClass}>
-								Use the bike for work or personal riding. We handle ongoing maintenance so you
-								can stay on the road.
+								Use the bike for work or personal riding. We handle ongoing maintenance so you can stay on the
+								road.
 							</p>
 						</div>
 					</div>
@@ -182,11 +184,9 @@ export default function RentalPage() {
 
 			{/* Cross-sell — flush under image, tighter copy */}
 			<section className="w-full bg-primary">
-				<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-10">
-					<h2 className="text-lg sm:text-xl lg:text-2xl font-semibold text-foreground">
-						Prefer to own?
-					</h2>
-					<p className="mt-2 sm:mt-3 text-sm sm:text-base text-foreground/90 max-w-2xl">
+				<div className={`${SECTION_CONTAINER} ${SECTION_Y}`}>
+					<h2 className={`${HEADING_SECTION} text-foreground`}>Prefer to own?</h2>
+					<p className="mt-2 sm:mt-3 max-w-2xl text-sm sm:text-base text-foreground/90">
 						Excalibur Journey: same courier-tough build. Yours for good.
 					</p>
 				</div>

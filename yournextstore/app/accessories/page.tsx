@@ -1,11 +1,25 @@
 import Image from "next/image";
 import Link from "next/link";
+import { AccessoriesLeadForm } from "@/components/sections/accessories-lead-form";
 import { Newsletter } from "@/components/sections/newsletter";
 import { getStaticAccessories } from "@/lib/static/accessories";
+import {
+	BODY_COPY,
+	BUTTON_PILL_GHOST,
+	BUTTON_PILL_PRIMARY,
+	HEADING_PAGE,
+	HEADING_SECTION,
+	SECTION_CONTAINER,
+	SECTION_DIVIDER_TOP,
+	SECTION_Y,
+} from "@/lib/ui-classes";
 
 export const metadata = {
 	title: "Accessories — Neutronic",
 	description: "Range-extending accessories and add-ons for Neutronic builds.",
+	alternates: {
+		canonical: "/accessories",
+	},
 };
 
 export default function AccessoriesPage() {
@@ -14,18 +28,16 @@ export default function AccessoriesPage() {
 	return (
 		<main className="min-h-screen bg-[#fdfdfd] text-foreground overflow-x-hidden">
 			<header className="w-full bg-primary">
-				<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 lg:py-12">
-					<h1 className="text-2xl sm:text-3xl md:text-4xl font-semibold italic text-primary-foreground">
-						Accessories
-					</h1>
-					<p className="mt-2 sm:mt-3 text-sm sm:text-base text-primary-foreground/80 max-w-2xl">
-						Upgrades built for riders who can&apos;t afford downtime. Get availability and fitment help
-						in one message.
+				<div className={`${SECTION_CONTAINER} py-8 sm:py-10 lg:py-12`}>
+					<h1 className={`${HEADING_PAGE} text-primary-foreground`}>Accessories</h1>
+					<p className="mt-2 sm:mt-3 max-w-2xl text-sm sm:text-base text-primary-foreground/80">
+						Upgrades built for riders who can&apos;t afford downtime. Get availability and fitment help in one
+						message.
 					</p>
 					<div className="mt-5 sm:mt-6">
 						<Link
 							href="#lead"
-							className="inline-flex items-center justify-center min-h-[44px] sm:min-h-[48px] px-6 sm:px-8 bg-foreground text-primary rounded-full text-sm sm:text-base font-semibold hover:opacity-90 transition-opacity focus:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2 focus-visible:ring-offset-primary"
+							className={`${BUTTON_PILL_PRIMARY} bg-foreground text-primary focus-visible:ring-foreground focus-visible:ring-offset-primary`}
 						>
 							Check availability
 						</Link>
@@ -33,7 +45,7 @@ export default function AccessoriesPage() {
 				</div>
 			</header>
 
-			<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-10">
+			<div className={`${SECTION_CONTAINER} ${SECTION_Y}`}>
 				<section aria-label="Accessories list" className="space-y-10 sm:space-y-12 lg:space-y-14">
 					{accessories.map((a, idx) => {
 						const [primary] = a.images;
@@ -83,12 +95,8 @@ export default function AccessoriesPage() {
 
 									{/* Details */}
 									<div className="mt-4 lg:mt-0">
-										<h2 className="text-xl sm:text-2xl font-semibold italic text-foreground">
-											{a.name}
-										</h2>
-										<p className="mt-2 text-sm sm:text-base text-muted-foreground max-w-xl">
-											{a.tagline}
-										</p>
+										<h2 className="text-xl sm:text-2xl font-semibold italic text-foreground">{a.name}</h2>
+										<p className="mt-2 text-sm sm:text-base text-muted-foreground max-w-xl">{a.tagline}</p>
 										<p className="mt-4 text-sm sm:text-base text-foreground/80 max-w-xl leading-relaxed">
 											{a.description}
 										</p>
@@ -101,16 +109,10 @@ export default function AccessoriesPage() {
 											))}
 										</ul>
 										<div className="mt-6 flex flex-col sm:flex-row gap-3">
-											<Link
-												href="#lead"
-												className="inline-flex items-center justify-center min-h-[44px] sm:min-h-[48px] px-6 sm:px-8 bg-primary text-primary-foreground rounded-full text-sm sm:text-base font-semibold hover:opacity-90 transition-opacity focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-[#fdfdfd]"
-											>
+											<Link href="#lead" className={BUTTON_PILL_PRIMARY}>
 												Get pricing &amp; fitment
 											</Link>
-											<Link
-												href="/rental"
-												className="inline-flex items-center justify-center min-h-[44px] sm:min-h-[48px] px-6 sm:px-8 border border-border rounded-full text-sm sm:text-base font-semibold hover:bg-muted transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-[#fdfdfd]"
-											>
+											<Link href="/rental" className={BUTTON_PILL_GHOST}>
 												Prefer to rent?
 											</Link>
 										</div>
@@ -121,13 +123,17 @@ export default function AccessoriesPage() {
 					})}
 				</section>
 
-				<section id="lead" className="mt-10 sm:mt-12 lg:mt-14 border-t border-border pt-8 sm:pt-10 lg:pt-12">
-					<h2 className="text-lg sm:text-xl lg:text-2xl font-semibold text-foreground mb-2">
-						Check accessory availability
-					</h2>
-					<p className="text-muted-foreground text-sm sm:text-base mb-6 max-w-xl">
+				<section id="lead" className={SECTION_DIVIDER_TOP}>
+					<h2 className={`${HEADING_SECTION} text-foreground mb-2`}>Check accessory availability</h2>
+					<p className={`${BODY_COPY} mb-6 max-w-xl`}>
 						Drop your email and we&apos;ll reply with compatibility, pricing, and next steps.
 					</p>
+					<AccessoriesLeadForm
+						options={accessories.map((accessory) => ({
+							id: accessory.id,
+							name: accessory.name,
+						}))}
+					/>
 				</section>
 			</div>
 
@@ -135,4 +141,3 @@ export default function AccessoriesPage() {
 		</main>
 	);
 }
-

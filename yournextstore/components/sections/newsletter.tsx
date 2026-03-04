@@ -4,6 +4,7 @@ import { ArrowRightIcon, CheckIcon } from "lucide-react";
 import Link from "next/link";
 import { useActionState } from "react";
 import { subscribeToNewsletter } from "@/app/newsletter/action";
+import { BUTTON_PILL_BASE } from "@/lib/ui-classes";
 
 export function Newsletter() {
 	const [state, action, isPending] = useActionState(subscribeToNewsletter, null);
@@ -22,13 +23,13 @@ export function Newsletter() {
 							<div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
 								<Link
 									href="/catalog"
-									className="inline-flex h-12 items-center justify-center rounded-full bg-primary px-8 font-semibold text-primary-foreground hover:opacity-90 transition-opacity focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-foreground"
+									className={`${BUTTON_PILL_BASE} min-h-[48px] bg-primary text-primary-foreground hover:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-foreground`}
 								>
 									Explore bikes
 								</Link>
 								<Link
 									href="/rental"
-									className="inline-flex h-12 items-center justify-center rounded-full border border-background/20 px-8 font-medium text-background hover:bg-background/10 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-foreground"
+									className={`${BUTTON_PILL_BASE} min-h-[48px] border border-background/20 text-background hover:bg-background/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-foreground`}
 								>
 									See rentals
 								</Link>
@@ -40,7 +41,8 @@ export function Newsletter() {
 								Get drops, restocks, and rental openings
 							</h2>
 							<p className="mt-4 text-lg leading-relaxed text-background/60 max-w-xl mx-auto">
-								One email gets you early access to new Excalibur builds, accessory restocks, and first pick of rental spots.
+								One email gets you early access to new Excalibur builds, accessory restocks, and first pick of
+								rental spots.
 							</p>
 							<ul className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-3 text-left text-sm text-background/70 max-w-xl mx-auto">
 								<li className="flex gap-2">
@@ -71,15 +73,13 @@ export function Newsletter() {
 								<button
 									type="submit"
 									disabled={isPending}
-									className="inline-flex h-12 shrink-0 items-center justify-center gap-2 rounded-full bg-background px-8 font-medium text-foreground transition-all hover:bg-background/90 disabled:opacity-50"
+									className={`${BUTTON_PILL_BASE} min-h-[48px] shrink-0 gap-2 bg-background text-foreground hover:bg-background/90 disabled:opacity-50`}
 								>
 									{isPending ? "Joining\u2026" : "Get updates"}
 									{!isPending && <ArrowRightIcon className="h-4 w-4" />}
 								</button>
 							</form>
-							<p className="mt-3 text-xs text-background/50">
-								No spam. Just drops, restocks, and openings.
-							</p>
+							<p className="mt-3 text-xs text-background/50">No spam. Just drops, restocks, and openings.</p>
 							{state?.error && <p className="mt-4 text-sm text-red-300">{state.error}</p>}
 						</>
 					)}
