@@ -46,7 +46,7 @@ export const ASSETS = {
 	// Home – Hunter block
 	hunter: {
 		grid1: "/images/Back.png",
-		grid2: "/images/01-new.jpg",
+		grid2: "/images/01-new.png",
 		logo: "/images/ExcaliburHunterBlack.png",
 		slides: [
 			"/images/Yellow.jpg",

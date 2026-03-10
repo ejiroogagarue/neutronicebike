@@ -62,7 +62,7 @@ export function HomeProductBlock({
 							alt=""
 							fill
 							sizes="(max-width: 640px) 100vw, 50vw"
-							className="object-cover"
+							className={variant === "hunter" ? "object-cover object-center scale-[1.05]" : "object-cover"}
 							loading="lazy"
 							decoding="async"
 						/>
